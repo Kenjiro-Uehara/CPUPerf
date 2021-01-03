@@ -13,11 +13,17 @@ import java.util.function.Consumer;
  */
 public class CPUPerformanceGetScheduler {
     private ScheduledExecutorService executorService;
+    private CPUPerformanceGetter cpuPerformanceGetter;
 
     public void start(Consumer<CPUPerformance> handler, long intervalMillis) {
         executorService = Executors.newSingleThreadScheduledExecutor(this::createThread);
-        executorService.scheduleAtFixedRate(new TaskExecutor(new CPUPerformanceGetter(), handler),
+        cpuPerformanceGetter = new CPUPerformanceGetter();
+        executorService.scheduleAtFixedRate(new TaskExecutor(cpuPerformanceGetter, handler),
                                             intervalMillis, intervalMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public CPUPerformanceGetter getCpuPerformanceGetter() {
+        return cpuPerformanceGetter;
     }
 
     public void stop() {
